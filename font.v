@@ -5,7 +5,7 @@ module font (
         input wire [9:0]  pos_x,       // X screen position.
         input wire [9:0]  pos_y,       // Y screen position.
         input wire [7:0]  character,   // Character to stream.
-        output wire data
+        output reg data
     );
 
     parameter FILE_FONT = "BRAM_8.list";
@@ -15,8 +15,9 @@ module font (
     localparam w = 8;  // Font rom width
     localparam h = 16*16*8;  // Font rom height
 
-    initial
-    begin
+    reg [w-1:0] rom [0:h-1];
+    
+    initial begin
         $readmemb(FILE_FONT, rom);
     end
 
@@ -27,14 +28,9 @@ module font (
     assign col =  ~ pos_x[2:0];
 
     // Read Rom Logic
-    reg [w-1:0] rom [0:h-1];
-    reg [7:0] dout;
-
     always @(posedge px_clk) begin
-        dout <= rom[row];
+        data <= rom[row][col];
     end
     // End Read Rom Logic
     
-    assign data = dout[col];
-
 endmodule
